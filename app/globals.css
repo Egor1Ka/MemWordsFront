@@ -1,0 +1,336 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@layer base {
+	a,
+	button,
+	[role='button'],
+	[type='button'],
+	[type='submit'],
+	[type='reset'],
+	select,
+	summary,
+	[tabindex]:not([tabindex='-1']),
+	[data-slot$='-trigger'],
+	[data-slot$='-link'],
+	[data-slot$='-item'],
+	[data-slot$='-close'],
+	[data-slot$='-action'],
+	[data-slot$='-cancel'],
+	[data-slot$='-sub-trigger'] {
+		cursor: pointer;
+	}
+
+	[data-slot$='-thumb'] {
+		cursor: grab;
+
+		&:active {
+			cursor: grabbing;
+		}
+	}
+}
+
+/* ── Pixel / Dark-Fantasy (purple) theme ─────────────────────────────────────
+   Verbatim palette from tweakcn. Fonts wired to next/font variables (the
+   families ship Cyrillic, so Ukrainian text renders pixel too). */
+:root {
+	--background: oklch(0.2112 0.0381 302.649);
+	--foreground: oklch(0.8947 0.0427 310.0654);
+	--card: oklch(0.2592 0.0638 302.5515);
+	--card-foreground: oklch(0.8947 0.0427 310.0654);
+	--popover: oklch(0.2112 0.0381 302.649);
+	--popover-foreground: oklch(0.8947 0.0427 310.0654);
+	--primary: oklch(0.6268 0.2325 303.9004);
+	--primary-foreground: oklch(1 0 0);
+	--secondary: oklch(0.3793 0.116 290.8547);
+	--secondary-foreground: oklch(1 0 0);
+	--muted: oklch(0.3588 0.1354 278.6973);
+	--muted-foreground: oklch(0.7107 0.0351 256.7878);
+	--accent: oklch(0.4955 0.2369 301.9241);
+	--accent-foreground: oklch(1 0 0);
+	--destructive: oklch(0.3958 0.1331 25.723);
+	--destructive-foreground: oklch(1 0 0);
+	--border: oklch(0.3796 0.1783 293.7446);
+	--input: oklch(0.3796 0.1783 293.7446);
+	--ring: oklch(0.6268 0.2325 303.9004);
+	--chart-1: oklch(0.6268 0.2325 303.9004);
+	--chart-2: oklch(0.4955 0.2369 301.9241);
+	--chart-3: oklch(0.4383 0.1983 303.7241);
+	--chart-4: oklch(0.3807 0.1661 304.9874);
+	--chart-5: oklch(0.2905 0.1432 302.7167);
+	--sidebar: oklch(0.2112 0.0381 302.649);
+	--sidebar-foreground: oklch(0.8947 0.0427 310.0654);
+	--sidebar-primary: oklch(0.6268 0.2325 303.9004);
+	--sidebar-primary-foreground: oklch(1 0 0);
+	--sidebar-accent: oklch(0.3793 0.116 290.8547);
+	--sidebar-accent-foreground: oklch(1 0 0);
+	--sidebar-border: oklch(0.3796 0.1783 293.7446);
+	--sidebar-ring: oklch(0.6268 0.2325 303.9004);
+	--font-sans: var(--font-press-start), 'Press Start 2P', system-ui;
+	--font-serif: var(--font-vt323), 'VT323', serif;
+	--font-mono: var(--font-dotgothic), 'DotGothic16', monospace;
+	--radius: 0rem;
+	--shadow-2xs: 4px 4px 0px 4px hsl(0 0% 0% / 0.2);
+	--shadow-xs: 4px 4px 0px 4px hsl(0 0% 0% / 0.2);
+	--shadow-sm: 4px 4px 0px 4px hsl(0 0% 0% / 0.4), 4px 1px 2px 3px hsl(0 0% 0% / 0.4);
+	--shadow: 4px 4px 0px 4px hsl(0 0% 0% / 0.4), 4px 1px 2px 3px hsl(0 0% 0% / 0.4);
+	--shadow-md: 4px 4px 0px 4px hsl(0 0% 0% / 0.4), 4px 2px 4px 3px hsl(0 0% 0% / 0.4);
+	--shadow-lg: 4px 4px 0px 4px hsl(0 0% 0% / 0.4), 4px 4px 6px 3px hsl(0 0% 0% / 0.4);
+	--shadow-xl: 4px 4px 0px 4px hsl(0 0% 0% / 0.4), 4px 8px 10px 3px hsl(0 0% 0% / 0.4);
+	--shadow-2xl: 4px 4px 0px 4px hsl(0 0% 0% / 1);
+	--tracking-normal: -0.05em;
+	--spacing: 0.25rem;
+}
+
+.dark {
+	--background: oklch(0.1383 0.0207 300.0806);
+	--foreground: oklch(0.8268 0.1082 306.3827);
+	--card: oklch(0.1703 0.0393 299.189);
+	--card-foreground: oklch(0.8268 0.1082 306.3827);
+	--popover: oklch(0.1383 0.0207 300.0806);
+	--popover-foreground: oklch(0.8268 0.1082 306.3827);
+	--primary: oklch(0.7217 0.1767 305.5038);
+	--primary-foreground: oklch(0 0 0);
+	--secondary: oklch(0.2827 0.1351 291.0894);
+	--secondary-foreground: oklch(0.8268 0.1082 306.3827);
+	--muted: oklch(0.2573 0.0861 281.2883);
+	--muted-foreground: oklch(0.5854 0.2041 277.1173);
+	--accent: oklch(0.5575 0.2525 302.3212);
+	--accent-foreground: oklch(1 0 0);
+	--destructive: oklch(0.4437 0.1613 26.8994);
+	--destructive-foreground: oklch(1 0 0);
+	--border: oklch(0.3807 0.1661 304.9874);
+	--input: oklch(0.2905 0.1432 302.7167);
+	--ring: oklch(0.7217 0.1767 305.5038);
+	--chart-1: oklch(0.7217 0.1767 305.5038);
+	--chart-2: oklch(0.5575 0.2525 302.3212);
+	--chart-3: oklch(0.4955 0.2369 301.9241);
+	--chart-4: oklch(0.4383 0.1983 303.7241);
+	--chart-5: oklch(0.3796 0.1783 293.7446);
+	--sidebar: oklch(0.1383 0.0207 300.0806);
+	--sidebar-foreground: oklch(0.8268 0.1082 306.3827);
+	--sidebar-primary: oklch(0.7217 0.1767 305.5038);
+	--sidebar-primary-foreground: oklch(0 0 0);
+	--sidebar-accent: oklch(0.2827 0.1351 291.0894);
+	--sidebar-accent-foreground: oklch(0.8268 0.1082 306.3827);
+	--sidebar-border: oklch(0.3807 0.1661 304.9874);
+	--sidebar-ring: oklch(0.7217 0.1767 305.5038);
+	--shadow-2xs: 6px 6px 0px 6px hsl(0 0% 0% / 0.4);
+	--shadow-xs: 6px 6px 0px 6px hsl(0 0% 0% / 0.4);
+	--shadow-sm: 6px 6px 0px 6px hsl(0 0% 0% / 0.8), 6px 1px 2px 5px hsl(0 0% 0% / 0.8);
+	--shadow: 6px 6px 0px 6px hsl(0 0% 0% / 0.8), 6px 1px 2px 5px hsl(0 0% 0% / 0.8);
+	--shadow-md: 6px 6px 0px 6px hsl(0 0% 0% / 0.8), 6px 2px 4px 5px hsl(0 0% 0% / 0.8);
+	--shadow-lg: 6px 6px 0px 6px hsl(0 0% 0% / 0.8), 6px 4px 6px 5px hsl(0 0% 0% / 0.8);
+	--shadow-xl: 6px 6px 0px 6px hsl(0 0% 0% / 0.8), 6px 8px 10px 5px hsl(0 0% 0% / 0.8);
+	--shadow-2xl: 6px 6px 0px 6px hsl(0 0% 0% / 2);
+}
+
+@theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+	--color-chart-5: var(--chart-5);
+	--color-sidebar: var(--sidebar);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-ring: var(--sidebar-ring);
+
+	--font-sans: var(--font-sans);
+	--font-mono: var(--font-mono);
+	--font-serif: var(--font-serif);
+	--font-display: var(--font-serif);
+
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+
+	--shadow-2xs: var(--shadow-2xs);
+	--shadow-xs: var(--shadow-xs);
+	--shadow-sm: var(--shadow-sm);
+	--shadow: var(--shadow);
+	--shadow-md: var(--shadow-md);
+	--shadow-lg: var(--shadow-lg);
+	--shadow-xl: var(--shadow-xl);
+	--shadow-2xl: var(--shadow-2xl);
+
+	--tracking-tighter: calc(var(--tracking-normal) - 0.05em);
+	--tracking-tight: calc(var(--tracking-normal) - 0.025em);
+	--tracking-normal: var(--tracking-normal);
+	--tracking-wide: calc(var(--tracking-normal) + 0.025em);
+	--tracking-wider: calc(var(--tracking-normal) + 0.05em);
+	--tracking-widest: calc(var(--tracking-normal) + 0.1em);
+}
+
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	body {
+		@apply bg-background text-foreground;
+		letter-spacing: var(--tracking-normal);
+	}
+}
+
+/* ── Dark-fantasy animations ────────────────────────────────────────────── */
+@keyframes ember-rise {
+	0% {
+		transform: translateY(0) translateX(0) scale(1);
+		opacity: 0;
+	}
+	12% {
+		opacity: var(--ember-opacity, 0.7);
+	}
+	100% {
+		transform: translateY(-140px) translateX(var(--ember-drift, 12px))
+			scale(0.35);
+		opacity: 0;
+	}
+}
+
+@keyframes flicker {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	42% {
+		opacity: 0.82;
+	}
+	48% {
+		opacity: 0.5;
+	}
+	54% {
+		opacity: 0.92;
+	}
+	70% {
+		opacity: 0.7;
+	}
+}
+
+@keyframes glow-pulse {
+	0%,
+	100% {
+		filter: drop-shadow(0 0 2px color-mix(in oklch, var(--primary) 55%, transparent));
+	}
+	50% {
+		filter: drop-shadow(0 0 11px color-mix(in oklch, var(--primary) 85%, transparent));
+	}
+}
+
+@keyframes float-slow {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-6px);
+	}
+}
+
+@keyframes rune-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes rune-spin-reverse {
+	to {
+		transform: rotate(-360deg);
+	}
+}
+
+@layer utilities {
+	.animate-ember {
+		animation: ember-rise linear infinite;
+	}
+	.animate-flicker {
+		animation: flicker 3.2s ease-in-out infinite;
+	}
+	.animate-glow-pulse {
+		animation: glow-pulse 2.8s ease-in-out infinite;
+	}
+	.animate-float-slow {
+		animation: float-slow 4.5s ease-in-out infinite;
+	}
+	.animate-rune-spin {
+		animation: rune-spin 26s linear infinite;
+		transform-origin: center;
+	}
+	.animate-rune-spin-reverse {
+		animation: rune-spin-reverse 34s linear infinite;
+		transform-origin: center;
+	}
+	.fantasy-glow {
+		filter: drop-shadow(
+			0 0 6px color-mix(in oklch, var(--primary) 70%, transparent)
+		);
+	}
+	.fantasy-card-hover {
+		transition:
+			box-shadow 0.25s ease,
+			transform 0.25s ease,
+			border-color 0.25s ease;
+	}
+	.fantasy-card-hover:hover {
+		transform: translateY(-2px);
+		border-color: var(--primary);
+		box-shadow:
+			0 0 0 1px var(--primary),
+			0 10px 28px -10px color-mix(in oklch, var(--primary) 55%, transparent);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.animate-ember,
+	.animate-flicker,
+	.animate-glow-pulse,
+	.animate-float-slow,
+	.animate-rune-spin,
+	.animate-rune-spin-reverse {
+		animation: none !important;
+	}
+	.fantasy-card-hover:hover {
+		transform: none;
+	}
+}
+
+/* ── Mobile scaling ─────────────────────────────────────────────────────────
+   The pixel font is very wide; shrink the root size on small screens so the
+   whole UI (text, spacing, controls all use rem) scales down to fit. */
+@media (max-width: 640px) {
+	html {
+		font-size: 13px;
+	}
+}
+@media (max-width: 400px) {
+	html {
+		font-size: 11.5px;
+	}
+}

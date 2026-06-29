@@ -1,0 +1,23 @@
+# Add this block to your EXISTING Caddyfile (/opt/slotix/Caddyfile),
+# next to the slotixs.uk block. Then: docker compose restart caddy.
+# Caddy will auto-issue a Let's Encrypt cert for memwords.uk once the
+# A record points to the server and ports 80/443 are open.
+
+memwords.uk {
+	log {
+		output stdout
+		format console
+	}
+
+	handle /api/* {
+		reverse_proxy memwords-api:9000
+	}
+
+	handle {
+		reverse_proxy memwords-web:3000
+	}
+}
+
+www.memwords.uk {
+	redir https://memwords.uk{uri} permanent
+}

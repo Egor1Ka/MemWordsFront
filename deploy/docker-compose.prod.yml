@@ -1,0 +1,32 @@
+# MemWords production stack (Contabo VPS, lives in /opt/memwords/).
+# No Caddy here on purpose: the server already runs ONE Caddy (in /opt/slotix)
+# that owns :80/:443. MemWords web/api join the shared external "edge" network
+# so that Caddy can reverse-proxy memwords.uk to them. See deploy/README.md.
+services:
+  web:
+    image: ghcr.io/egor1ka/memwordsfront:latest
+    container_name: memwords-web
+    pull_policy: always
+    environment:
+      NODE_ENV: production
+      BACKEND_URL: http://api:9000
+    restart: unless-stopped
+    networks: [memwords, edge]
+    depends_on: [api]
+
+  api:
+    image: ghcr.io/egor1ka/memwords-back:latest
+    container_name: memwords-api
+    pull_policy: always
+    env_file:
+      - .env.api
+    restart: unless-stopped
+    networks: [memwords, edge]
+
+networks:
+  # Internal network: web <-> api only.
+  memwords:
+    driver: bridge
+  # Shared with the edge Caddy (created once: `docker network create edge`).
+  edge:
+    external: true
