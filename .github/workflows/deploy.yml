@@ -36,7 +36,7 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URL=
             NEXT_PUBLIC_SITE_URL=https://memwords.uk
-            BACKEND_URL=http://api:9000
+            BACKEND_URL=http://memwords-api:9000
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -53,6 +53,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /opt/memwords
-            docker compose -f docker-compose.prod.yml pull web
-            docker compose -f docker-compose.prod.yml up -d web
+            docker compose -f docker-compose.prod.yml pull memwords-web
+            docker compose -f docker-compose.prod.yml up -d memwords-web
             docker image prune -f
