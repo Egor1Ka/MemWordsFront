@@ -52,6 +52,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            set -e
             cd /opt/memwords
             docker compose -f docker-compose.prod.yml pull memwords-web
             docker compose -f docker-compose.prod.yml up -d --no-deps memwords-web

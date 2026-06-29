@@ -11,8 +11,12 @@ services:
   memwords-api:
     image: ghcr.io/egor1ka/memwords-back:latest
     container_name: memwords-api
+    # .env.api is written by the backend CI ("Sync .env.api on server"). Marked
+    # required:false so `up --no-deps memwords-web` can parse/start the web service
+    # even before the backend's first deploy has created the file.
     env_file:
-      - .env.api
+      - path: .env.api
+        required: false
     pull_policy: always
     restart: unless-stopped
     networks: [memwords]
