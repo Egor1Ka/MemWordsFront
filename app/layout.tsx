@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 	applicationName: 'MemWords',
 	title: 'MemWords',
 	description:
-		'Learn English vocabulary with SM-2 spaced repetition in a dark-fantasy flashcard app.',
+		'Remember every word with SM-2 spaced repetition. Build decks, add cards with images, and review each word right before you forget it.',
 }
 
 export default async function RootLayout({

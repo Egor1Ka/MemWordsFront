@@ -1,8 +1,8 @@
 {
 	"metadata": {
 		"title": "MemWords",
-		"description": "Learn English vocabulary with SM-2 spaced repetition — forge decks, add cards with images, and study in a dark-fantasy flashcard app.",
-		"home": "MemWords — Dark-Fantasy Vocabulary Trainer",
+		"description": "Remember every word with SM-2 spaced repetition. Build decks, add cards with images, and review each word right before you forget it.",
+		"home": "MemWords — Spaced Repetition Vocabulary Trainer",
 		"app": "My decks",
 		"auth": "Sign in"
 	},
@@ -51,7 +51,7 @@
 	"anki": {
 		"dashboard": {
 			"title": "Dashboard",
-			"subtitle": "Learn English vocabulary with spaced repetition. Open your decks to start studying."
+			"subtitle": "Memorize words with spaced repetition. Open a deck to start a review session."
 		},
 		"visibility": {
 			"private": "Private",
@@ -182,7 +182,7 @@
 			"next": "Next"
 		},
 		"nav": {
-			"brand": "Anki",
+			"brand": "MemWords",
 			"menu": "Menu",
 			"billing": "Billing"
 		},
@@ -205,15 +205,15 @@
 		},
 		"hero": {
 			"badge": "Spaced repetition · SM-2",
-			"title": "Master English, one card at a time",
-			"subtitle": "A dark-fantasy flashcard grimoire. Forge decks, inscribe words, and let spaced repetition burn them into memory.",
-			"cta": "Start learning",
+			"title": "Remember every word",
+			"subtitle": "Turn new words into long-term memory. Build decks, add cards, and let spaced repetition bring each one back right before you forget.",
+			"cta": "Start remembering",
 			"ctaGuest": "Get started",
 			"secondary": "Sign in"
 		},
 		"features": {
 			"title": "Everything you need to remember",
-			"subtitle": "Built for serious vocabulary grinding.",
+			"subtitle": "Built to make new words stick for good.",
 			"items": {
 				"srs": {
 					"title": "SM-2 spaced repetition",
@@ -228,7 +228,7 @@
 					"description": "Attach pictures to both sides — upload straight from your device."
 				},
 				"study": {
-					"title": "Focused study",
+					"title": "Focused review",
 					"description": "Due cards first, then new ones. Rate Again / Hard / Good / Easy."
 				},
 				"table": {
@@ -236,8 +236,8 @@
 					"description": "Browse every word with translations hidden behind a blur — reveal on tap."
 				},
 				"theme": {
-					"title": "Light & dark fantasy",
-					"description": "Switch between parchment and dark-fantasy themes anytime."
+					"title": "Light & dark theme",
+					"description": "Switch between light and dark themes anytime."
 				}
 			}
 		},
@@ -245,27 +245,27 @@
 			"title": "How it works",
 			"steps": {
 				"one": {
-					"title": "Forge a deck",
-					"description": "Create a themed deck for whatever you want to learn."
+					"title": "Create a deck",
+					"description": "Create a themed deck for the words you want to remember."
 				},
 				"two": {
-					"title": "Inscribe cards",
+					"title": "Add cards",
 					"description": "Add words with translations, notes and images."
 				},
 				"three": {
-					"title": "Study & repeat",
-					"description": "Let SM-2 bring each card back exactly on time."
+					"title": "Review & repeat",
+					"description": "Spaced repetition brings each card back exactly on time."
 				}
 			}
 		},
 		"cta": {
-			"title": "Ready to begin your journey?",
-			"subtitle": "Sign in with Google and forge your first deck.",
+			"title": "Ready to remember more?",
+			"subtitle": "Sign in with Google and create your first deck.",
 			"button": "Get started"
 		},
 		"footer": {
-			"tagline": "Dark-fantasy vocabulary trainer",
-			"rights": "Built for learning."
+			"tagline": "Spaced repetition vocabulary trainer",
+			"rights": "Built to help you remember."
 		}
 	}
 }
