@@ -17,6 +17,13 @@ services:
     env_file:
       - path: .env.api
         required: false
+    # Explicit upstream DNS: the host's systemd-resolved stub (127.0.0.53) that
+    # Docker's embedded resolver forwards to was intermittently returning
+    # EAI_AGAIN, breaking the Google OAuth token exchange (server-to-server call
+    # to www.googleapis.com). Point straight at Cloudflare/Google DNS instead.
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     pull_policy: always
     restart: unless-stopped
     networks: [memwords]
@@ -27,6 +34,9 @@ services:
     environment:
       NODE_ENV: production
       BACKEND_URL: http://memwords-api:9000
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     pull_policy: always
     restart: unless-stopped
     networks: [memwords]
