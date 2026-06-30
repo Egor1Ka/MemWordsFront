@@ -74,7 +74,14 @@
 			"subtitle": "Your vocabulary decks",
 			"create": "Create deck",
 			"emptyTitle": "No decks yet",
-			"emptyDescription": "Create your first deck to start building your vocabulary."
+			"emptyDescription": "Create your first deck to start building your vocabulary.",
+			"tabs": {
+				"mine": "My decks",
+				"saved": "Saved"
+			},
+			"savedEmptyTitle": "No saved decks",
+			"savedEmptyDescription": "Find decks in Explore and add them to your library.",
+			"exploreCta": "Explore decks"
 		},
 		"deck": {
 			"createTitle": "Create deck",
@@ -101,7 +108,11 @@
 			"noTaggedCards": "No cards with this tag",
 			"noTaggedCardsDescription": "No cards are tagged \"{tag}\" in this deck.",
 			"filterByTag": "Filter:",
-			"allTags": "All"
+			"allTags": "All",
+			"by": "by {name}",
+			"readonlyHint": "You're viewing a public deck by {name}.",
+			"subscribe": "Add to my decks",
+			"unsubscribe": "Remove from my decks"
 		},
 		"card": {
 			"add": "Add card",
@@ -176,6 +187,7 @@
 			"tapToReveal": "tap to reveal",
 			"sortNewest": "Newest first",
 			"sortOldest": "Oldest first",
+			"swap": "Swap sides",
 			"link": "Words table",
 			"empty": "No words yet",
 			"prev": "Prev",
@@ -184,7 +196,34 @@
 		"nav": {
 			"brand": "MemWords",
 			"menu": "Menu",
+			"explore": "Explore",
 			"billing": "Billing"
+		},
+		"explore": {
+			"title": "Explore decks",
+			"subtitle": "Find public decks and add them to your library",
+			"searchPlaceholder": "Search decks...",
+			"sortLabel": "Sort",
+			"sort": {
+				"new": "Newest",
+				"popular": "Popular",
+				"name": "Name"
+			},
+			"startTitle": "Discover decks",
+			"startDescription": "Search public decks shared by other learners.",
+			"emptyTitle": "No decks found",
+			"emptyDescription": "Try a different search.",
+			"by": "by {name}",
+			"subscribers": "{count, plural, =0 {No subscribers} one {# subscriber} other {# subscribers}}",
+			"add": "Add",
+			"added": "Added",
+			"adding": "Adding...",
+			"yourDeck": "Your deck",
+			"open": "Open",
+			"subscribed": "Added to your library",
+			"unsubscribed": "Removed from your library",
+			"prev": "Prev",
+			"next": "Next"
 		},
 		"theme": {
 			"toggle": "Toggle theme"

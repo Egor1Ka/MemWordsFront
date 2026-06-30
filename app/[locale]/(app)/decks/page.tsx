@@ -17,20 +17,79 @@ import {
 import { DeckCard } from '@/components/anki/deck-card'
 import { DeckFormDialog } from '@/components/anki/deck-form-dialog'
 import { deckApi } from '@/services'
-import type { DeckDTO } from '@/services'
+import type { DeckDTO, SavedDeckDTO } from '@/services'
 import { useApiErrorToast } from '@/lib/anki/use-api-error'
+
+// One library list mixes the user's own decks with the decks they saved
+// (subscribed to). A saved deck is marked with the author's avatar.
+interface LibraryEntry {
+	deck: DeckDTO
+	saved: boolean
+	ownerName: string | null
+	ownerAvatar: string | null
+	sortAt: number
+}
+
+const SKELETON_KEYS = [0, 1, 2, 3, 4, 5]
+
+const parseTime = (value: string | null | undefined): number => {
+	if (!value) return 0
+	const ms = Date.parse(value)
+	return Number.isNaN(ms) ? 0 : ms
+}
+
+const toOwnedEntry = (deck: DeckDTO): LibraryEntry => ({
+	deck,
+	saved: false,
+	ownerName: null,
+	ownerAvatar: null,
+	sortAt: parseTime(deck.updatedAt),
+})
+
+// A saved deck arrives as SavedDeckDTO; normalize it to the DeckDTO shape the
+// card needs (its edit/delete actions are hidden anyway).
+const savedToDeckDTO = (saved: SavedDeckDTO): DeckDTO => ({
+	id: saved.id,
+	ownerId: saved.ownerId ?? '',
+	name: saved.name,
+	description: saved.description,
+	visibility: saved.visibility,
+	createdAt: saved.createdAt ?? '',
+	updatedAt: saved.createdAt ?? '',
+	cardCount: saved.cardCount,
+})
+
+const toSavedEntry = (saved: SavedDeckDTO): LibraryEntry => ({
+	deck: savedToDeckDTO(saved),
+	saved: true,
+	ownerName: saved.ownerName,
+	ownerAvatar: saved.ownerAvatar,
+	sortAt: parseTime(saved.subscribedAt ?? saved.createdAt),
+})
+
+const bySortAtDesc = (a: LibraryEntry, b: LibraryEntry): number =>
+	b.sortAt - a.sortAt
+
+const mergeLibrary = (
+	owned: DeckDTO[],
+	saved: SavedDeckDTO[],
+): LibraryEntry[] =>
+	[...owned.map(toOwnedEntry), ...saved.map(toSavedEntry)].sort(bySortAtDesc)
 
 export default function DecksPage() {
 	const t = useTranslations('anki')
 	const notifyApiError = useApiErrorToast()
-	const [decks, setDecks] = useState<DeckDTO[]>([])
+	const [entries, setEntries] = useState<LibraryEntry[]>([])
 	const [loading, setLoading] = useState(true)
 	const [createOpen, setCreateOpen] = useState(false)
 
-	const fetchDecks = useCallback(async () => {
+	const fetchLibrary = useCallback(async () => {
 		try {
-			const result = await deckApi.list({ silent: true })
-			setDecks(result)
+			const [owned, saved] = await Promise.all([
+				deckApi.list({ silent: true }),
+				deckApi.listSaved({ silent: true }),
+			])
+			setEntries(mergeLibrary(owned, saved))
 		} catch (error) {
 			notifyApiError(error)
 		} finally {
@@ -39,11 +98,20 @@ export default function DecksPage() {
 	}, [notifyApiError])
 
 	useEffect(() => {
-		fetchDecks()
-	}, [fetchDecks])
+		fetchLibrary()
+	}, [fetchLibrary])
 
-	const renderDeck = (deck: DeckDTO) => (
-		<DeckCard key={deck.id} deck={deck} onChanged={fetchDecks} />
+	const openCreate = () => setCreateOpen(true)
+
+	const renderEntry = (entry: LibraryEntry) => (
+		<DeckCard
+			key={entry.deck.id}
+			deck={entry.deck}
+			onChanged={fetchLibrary}
+			saved={entry.saved}
+			ownerName={entry.ownerName}
+			ownerAvatar={entry.ownerAvatar}
+		/>
 	)
 
 	const renderSkeleton = (key: number) => (
@@ -51,15 +119,15 @@ export default function DecksPage() {
 	)
 
 	return (
-		<div className="mx-auto max-w-6xl p-4 sm:p-6">
-			<div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+		<div className="space-y-6">
+			<div className="flex flex-wrap items-center justify-between gap-4">
 				<div className="min-w-0">
 					<h1 className="text-xl font-semibold sm:text-2xl">
 						{t('decks.title')}
 					</h1>
 					<p className="text-muted-foreground text-sm">{t('decks.subtitle')}</p>
 				</div>
-				<Button onClick={() => setCreateOpen(true)}>
+				<Button onClick={openCreate}>
 					<Plus />
 					{t('decks.create')}
 				</Button>
@@ -67,9 +135,9 @@ export default function DecksPage() {
 
 			{loading ? (
 				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					{[0, 1, 2, 3, 4, 5].map(renderSkeleton)}
+					{SKELETON_KEYS.map(renderSkeleton)}
 				</div>
-			) : decks.length === 0 ? (
+			) : entries.length === 0 ? (
 				<Empty className="border-border rounded-xl border border-dashed py-16">
 					<EmptyHeader>
 						<EmptyMedia variant="default">
@@ -79,7 +147,7 @@ export default function DecksPage() {
 						<EmptyDescription>{t('decks.emptyDescription')}</EmptyDescription>
 					</EmptyHeader>
 					<EmptyContent>
-						<Button onClick={() => setCreateOpen(true)}>
+						<Button onClick={openCreate}>
 							<Plus />
 							{t('decks.create')}
 						</Button>
@@ -87,14 +155,14 @@ export default function DecksPage() {
 				</Empty>
 			) : (
 				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					{decks.map(renderDeck)}
+					{entries.map(renderEntry)}
 				</div>
 			)}
 
 			<DeckFormDialog
 				open={createOpen}
 				onOpenChange={setCreateOpen}
-				onSuccess={fetchDecks}
+				onSuccess={fetchLibrary}
 			/>
 		</div>
 	)

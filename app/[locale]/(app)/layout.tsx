@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server'
 import { AppHeader } from '@/components/app-header'
 import { AppSidebar } from '@/components/app-sidebar'
 import { FantasyEmbers } from '@/components/anki/fantasy-embers'
+import { PageContainer } from '@/components/page-container'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { getUser } from '@/lib/auth/get-user'
 import { UserProvider } from '@/lib/auth/user-provider'
@@ -33,7 +34,7 @@ export default async function AppLayout({
 					<FantasyEmbers />
 					<div className="relative z-10 flex flex-1 flex-col">
 						<AppHeader />
-						<div className="flex flex-1 flex-col">{children}</div>
+						<PageContainer>{children}</PageContainer>
 					</div>
 				</SidebarInset>
 			</SidebarProvider>

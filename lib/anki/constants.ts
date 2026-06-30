@@ -6,6 +6,16 @@ const STUDY_DAILY_LIMIT = 20
 // Rows per page in the words table.
 const WORDS_PAGE_SIZE = 10
 
+// Deck cards per page on the Explore page (server-side pagination).
+const EXPLORE_PAGE_SIZE = 12
+
+// Sort options for the Explore page.
+type ExploreSortOption = 'new' | 'popular' | 'name'
+const EXPLORE_SORTS: ExploreSortOption[] = ['new', 'popular', 'name']
+
+// Debounce for the Explore search input, in milliseconds.
+const EXPLORE_SEARCH_DEBOUNCE_MS = 350
+
 // Visibility options for deck forms and badges.
 const VISIBILITIES: Visibility[] = ['private', 'public', 'unlisted']
 
@@ -23,5 +33,13 @@ const RATING_OPTIONS: RatingOption[] = [
 	{ rating: 3, key: 'easy' },
 ]
 
-export { STUDY_DAILY_LIMIT, WORDS_PAGE_SIZE, VISIBILITIES, RATING_OPTIONS }
-export type { RatingOption }
+export {
+	STUDY_DAILY_LIMIT,
+	WORDS_PAGE_SIZE,
+	EXPLORE_PAGE_SIZE,
+	EXPLORE_SORTS,
+	EXPLORE_SEARCH_DEBOUNCE_MS,
+	VISIBILITIES,
+	RATING_OPTIONS,
+}
+export type { RatingOption, ExploreSortOption }

@@ -4,9 +4,11 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { ArrowLeft, Inbox, Play, Table2 } from 'lucide-react'
+import { ArrowLeft, Check, Inbox, Play, Plus, Table2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Spinner } from '@/components/ui/spinner'
 import {
 	Empty,
 	EmptyContent,
@@ -22,6 +24,7 @@ import { DeckCardEntryItem } from '@/components/anki/deck-card-entry-item'
 import { deckApi } from '@/services'
 import type { DeckCardEntry, DeckDTO } from '@/services'
 import { isApiErrorWithStatus, useApiErrorToast } from '@/lib/anki/use-api-error'
+import { useUser } from '@/lib/auth/user-provider'
 
 const collectTags = (entries: DeckCardEntry[]): string[] => {
 	const all = entries.flatMap((entry) => entry.tags)
@@ -32,6 +35,7 @@ export default function DeckDetailPage() {
 	const { deckId } = useParams<{ deckId: string }>()
 	const t = useTranslations('anki')
 	const notifyApiError = useApiErrorToast()
+	const user = useUser()
 
 	const [deck, setDeck] = useState<DeckDTO | null>(null)
 	const [entries, setEntries] = useState<DeckCardEntry[]>([])
@@ -39,6 +43,10 @@ export default function DeckDetailPage() {
 	const [selectedTag, setSelectedTag] = useState<string | null>(null)
 	const [loading, setLoading] = useState(true)
 	const [deckMissing, setDeckMissing] = useState(false)
+	const [subscribed, setSubscribed] = useState(false)
+	const [subPending, setSubPending] = useState(false)
+
+	const isOwner = deck ? (deck.isOwner ?? deck.ownerId === user.id) : false
 
 	const refreshDeckMeta = useCallback(async () => {
 		try {
@@ -47,6 +55,7 @@ export default function DeckDetailPage() {
 				deckApi.listCards({ pathParams: { deckId }, silent: true }),
 			])
 			setDeck(deckResult)
+			setSubscribed(!!deckResult.isSubscribed)
 			setAllTags(collectTags(unfiltered))
 		} catch (error) {
 			if (isApiErrorWithStatus(error, 404)) {
@@ -90,18 +99,47 @@ export default function DeckDetailPage() {
 		refreshEntries()
 	}, [refreshDeckMeta, refreshEntries])
 
+	const subscribe = async () => {
+		await deckApi.subscribe({ pathParams: { deckId }, silent: true })
+		setSubscribed(true)
+		toast.success(t('explore.subscribed'))
+	}
+
+	const unsubscribe = async () => {
+		await deckApi.unsubscribe({ pathParams: { deckId }, silent: true })
+		setSubscribed(false)
+		toast.success(t('explore.unsubscribed'))
+	}
+
+	const handleToggleSubscribe = async () => {
+		setSubPending(true)
+		try {
+			await (subscribed ? unsubscribe() : subscribe())
+		} catch (error) {
+			notifyApiError(error)
+		} finally {
+			setSubPending(false)
+		}
+	}
+
 	const renderEntry = (entry: DeckCardEntry) => (
 		<DeckCardEntryItem
 			key={entry.id}
 			deckId={deckId}
 			card={entry}
 			onChanged={handleChanged}
+			readOnly={!isOwner}
 		/>
 	)
 
+	const renderSubscribeIcon = () => {
+		if (subPending) return <Spinner />
+		return subscribed ? <Check /> : <Plus />
+	}
+
 	if (deckMissing) {
 		return (
-			<div className="mx-auto max-w-5xl p-6">
+			<div className="py-6">
 				<Empty className="py-16">
 					<EmptyHeader>
 						<EmptyMedia variant="icon">
@@ -123,7 +161,7 @@ export default function DeckDetailPage() {
 
 	if (loading || !deck) {
 		return (
-			<div className="mx-auto max-w-5xl space-y-6 p-6">
+			<div className="space-y-6">
 				<Skeleton className="h-6 w-24" />
 				<Skeleton className="h-10 w-64" />
 				<Skeleton className="h-4 w-96" />
@@ -137,7 +175,7 @@ export default function DeckDetailPage() {
 	}
 
 	return (
-		<div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-6">
+		<div className="space-y-6">
 			<Link
 				href="/decks"
 				className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm"
@@ -154,6 +192,11 @@ export default function DeckDetailPage() {
 						</h1>
 						<VisibilityBadge visibility={deck.visibility} />
 					</div>
+					{!isOwner && deck.ownerName && (
+						<p className="text-muted-foreground text-sm">
+							{t('deck.by', { name: deck.ownerName })}
+						</p>
+					)}
 					{deck.description && (
 						<p className="text-muted-foreground max-w-prose text-sm">
 							{deck.description}
@@ -164,6 +207,16 @@ export default function DeckDetailPage() {
 					</p>
 				</div>
 				<div className="flex flex-wrap gap-2">
+					{!isOwner && (
+						<Button
+							variant={subscribed ? 'outline' : 'secondary'}
+							onClick={handleToggleSubscribe}
+							disabled={subPending}
+						>
+							{renderSubscribeIcon()}
+							{subscribed ? t('deck.unsubscribe') : t('deck.subscribe')}
+						</Button>
+					)}
 					<Button
 						variant="outline"
 						render={<Link href={`/decks/${deckId}/words`} />}
@@ -171,16 +224,14 @@ export default function DeckDetailPage() {
 						<Table2 />
 						{t('words.link')}
 					</Button>
-					<Button
-						render={<Link href={`/decks/${deckId}/study`} />}
-					>
+					<Button render={<Link href={`/decks/${deckId}/study`} />}>
 						<Play />
 						{t('study.start')}
 					</Button>
 				</div>
 			</div>
 
-			<QuickAddCard deckId={deckId} onAdded={handleChanged} />
+			{isOwner && <QuickAddCard deckId={deckId} onAdded={handleChanged} />}
 
 			{allTags.length > 0 && (
 				<TagFilter
@@ -202,7 +253,9 @@ export default function DeckDetailPage() {
 						<EmptyDescription>
 							{selectedTag
 								? t('deck.noTaggedCardsDescription', { tag: selectedTag })
-								: t('deck.noCardsDescription')}
+								: isOwner
+									? t('deck.noCardsDescription')
+									: t('deck.readonlyHint', { name: deck.ownerName ?? '' })}
 						</EmptyDescription>
 					</EmptyHeader>
 				</Empty>

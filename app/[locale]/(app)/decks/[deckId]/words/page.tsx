@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl'
 import {
 	ArrowDownWideNarrow,
 	ArrowLeft,
+	ArrowLeftRight,
 	ArrowUpNarrowWide,
 	ChevronLeft,
 	ChevronRight,
@@ -43,6 +44,10 @@ import { useApiErrorToast } from '@/lib/anki/use-api-error'
 
 type SortOrder = 'new' | 'old'
 
+// Per-deck localStorage key remembering whether the word/translation columns are
+// swapped (so each deck keeps its own orientation across visits).
+const SWAP_STORAGE_PREFIX = 'memwords:words-swap:'
+
 const addedAtMs = (entry: DeckCardEntry): number =>
 	new Date(entry.addedAt).getTime()
 
@@ -77,9 +82,27 @@ export default function WordsTablePage() {
 	const [deck, setDeck] = useState<DeckDTO | null>(null)
 	const [entries, setEntries] = useState<DeckCardEntry[]>([])
 	const [loading, setLoading] = useState(true)
+	const [swapped, setSwapped] = useState(false)
 
 	const sort: SortOrder = searchParams.get('sort') === 'old' ? 'old' : 'new'
 	const requestedPage = Math.max(1, Number(searchParams.get('page')) || 1)
+	const swapStorageKey = `${SWAP_STORAGE_PREFIX}${deckId}`
+
+	// Read the saved orientation after mount (localStorage is client-only).
+	useEffect(() => {
+		setSwapped(window.localStorage.getItem(swapStorageKey) === '1')
+	}, [swapStorageKey])
+
+	const toggleSwap = () => {
+		const next = !swapped
+		window.localStorage.setItem(swapStorageKey, next ? '1' : '0')
+		setSwapped(next)
+	}
+
+	const firstSide = (entry: DeckCardEntry) =>
+		swapped ? entry.back : entry.front
+	const secondSide = (entry: DeckCardEntry) =>
+		swapped ? entry.front : entry.back
 
 	useEffect(() => {
 		const load = async () => {
@@ -140,9 +163,9 @@ export default function WordsTablePage() {
 			<TableCell className="text-muted-foreground tabular-nums">
 				{(page - 1) * WORDS_PAGE_SIZE + index + 1}
 			</TableCell>
-			<TableCell className="font-medium">{entry.front.text}</TableCell>
+			<TableCell className="font-medium">{firstSide(entry).text}</TableCell>
 			<TableCell>
-				<RevealText text={entry.back.text} />
+				<RevealText text={secondSide(entry).text} />
 			</TableCell>
 			<TableCell className="hidden sm:table-cell">
 				<div className="flex flex-wrap gap-1">
@@ -178,7 +201,7 @@ export default function WordsTablePage() {
 	const SortIcon = sort === 'new' ? ArrowDownWideNarrow : ArrowUpNarrowWide
 
 	return (
-		<div className="mx-auto max-w-4xl space-y-5 p-4 sm:p-6">
+		<div className="space-y-5">
 			<Link
 				href={`/decks/${deckId}`}
 				className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm"
@@ -196,10 +219,19 @@ export default function WordsTablePage() {
 						{t('deck.cardCount', { count: total })}
 					</p>
 				</div>
-				<Button variant="outline" onClick={toggleSort}>
-					<SortIcon />
-					{sortLabel}
-				</Button>
+				<div className="flex flex-wrap gap-2">
+					<Button
+						variant={swapped ? 'default' : 'outline'}
+						onClick={toggleSwap}
+					>
+						<ArrowLeftRight />
+						{t('words.swap')}
+					</Button>
+					<Button variant="outline" onClick={toggleSort}>
+						<SortIcon />
+						{sortLabel}
+					</Button>
+				</div>
 			</div>
 
 			{loading ? (
@@ -224,8 +256,12 @@ export default function WordsTablePage() {
 							<TableHeader>
 								<TableRow>
 									<TableHead className="w-12">#</TableHead>
-									<TableHead>{t('words.word')}</TableHead>
-									<TableHead>{t('words.translation')}</TableHead>
+									<TableHead>
+										{swapped ? t('words.translation') : t('words.word')}
+									</TableHead>
+									<TableHead>
+										{swapped ? t('words.word') : t('words.translation')}
+									</TableHead>
 									<TableHead className="hidden sm:table-cell">
 										{t('words.tags')}
 									</TableHead>

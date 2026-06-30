@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import {
+	Compass,
 	LayoutDashboard,
 	Library,
 	Swords,
@@ -30,6 +31,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
 	{ href: '/dashboard', icon: LayoutDashboard, labelKey: 'dashboard.title' },
 	{ href: '/decks', icon: Library, labelKey: 'decks.title' },
+	{ href: '/explore', icon: Compass, labelKey: 'nav.explore' },
 ]
 
 export function AppSidebar() {

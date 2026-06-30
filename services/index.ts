@@ -77,5 +77,10 @@ export type {
 	RemoveCardFromDeckResult,
 	DeleteCardResult,
 	ResetReviewResult,
+	ExploreSort,
+	ExploreDeckDTO,
+	ExploreResult,
+	SavedDeckDTO,
+	SubscribeResult,
 } from './configs/anki.types'
 export type { UploadImageResult } from './configs/media.config'
