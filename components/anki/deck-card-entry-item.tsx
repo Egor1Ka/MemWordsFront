@@ -35,12 +35,14 @@ interface DeckCardEntryItemProps {
 	deckId: string
 	card: DeckCardEntry
 	onChanged: () => void
+	readOnly?: boolean
 }
 
 export function DeckCardEntryItem({
 	deckId,
 	card,
 	onChanged,
+	readOnly = false,
 }: DeckCardEntryItemProps) {
 	const t = useTranslations('anki')
 	const notifyApiError = useApiErrorToast()
@@ -137,44 +139,46 @@ export function DeckCardEntryItem({
 					</div>
 				</div>
 
-				<DropdownMenu>
-					<DropdownMenuTrigger
-						render={
-							<Button
-								variant="ghost"
-								size="icon-sm"
-								aria-label={t('actions.more')}
-							/>
-						}
-					>
-						<MoreVertical />
-					</DropdownMenuTrigger>
-					<DropdownMenuContent
-						align="end"
-						className="w-60 max-w-[calc(100vw-1.5rem)]"
-					>
-						<DropdownMenuItem onClick={() => setEditOpen(true)}>
-							<Pencil />
-							{t('card.editContent')}
-						</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => setTagsOpen(true)}>
-							<Tags />
-							{t('card.editTags')}
-						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem onClick={() => setConfirmMode('removeFromDeck')}>
-							<FolderMinus />
-							{t('card.removeFromDeck')}
-						</DropdownMenuItem>
-						<DropdownMenuItem
-							className="text-destructive"
-							onClick={() => setConfirmMode('deleteFully')}
+				{!readOnly && (
+					<DropdownMenu>
+						<DropdownMenuTrigger
+							render={
+								<Button
+									variant="ghost"
+									size="icon-sm"
+									aria-label={t('actions.more')}
+								/>
+							}
 						>
-							<Trash2 />
-							{t('card.deleteFully')}
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
+							<MoreVertical />
+						</DropdownMenuTrigger>
+						<DropdownMenuContent
+							align="end"
+							className="w-60 max-w-[calc(100vw-1.5rem)]"
+						>
+							<DropdownMenuItem onClick={() => setEditOpen(true)}>
+								<Pencil />
+								{t('card.editContent')}
+							</DropdownMenuItem>
+							<DropdownMenuItem onClick={() => setTagsOpen(true)}>
+								<Tags />
+								{t('card.editTags')}
+							</DropdownMenuItem>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem onClick={() => setConfirmMode('removeFromDeck')}>
+								<FolderMinus />
+								{t('card.removeFromDeck')}
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								className="text-destructive"
+								onClick={() => setConfirmMode('deleteFully')}
+							>
+								<Trash2 />
+								{t('card.deleteFully')}
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				)}
 			</div>
 
 			<CardFormDialog

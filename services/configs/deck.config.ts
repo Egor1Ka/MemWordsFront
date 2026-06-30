@@ -16,6 +16,9 @@ import type {
 	UpdateTagsBody,
 	DeleteDeckResult,
 	RemoveCardFromDeckResult,
+	ExploreResult,
+	SavedDeckDTO,
+	SubscribeResult,
 } from './anki.types'
 
 const deckApiConfig = {
@@ -24,6 +27,31 @@ const deckApiConfig = {
 		url: () => `/api/decks`,
 		method: getData,
 		defaultErrorMessage: 'Failed to load decks',
+	}),
+
+	// ── Discovery / subscriptions ──────────────────────────────────────────────
+	explore: endpoint<void, ExploreResult>({
+		url: () => `/api/decks/explore`,
+		method: getData,
+		defaultErrorMessage: 'Failed to load decks',
+	}),
+
+	listSaved: endpoint<void, SavedDeckDTO[]>({
+		url: () => `/api/decks/saved`,
+		method: getData,
+		defaultErrorMessage: 'Failed to load saved decks',
+	}),
+
+	subscribe: endpoint<void, SubscribeResult>({
+		url: ({ deckId }) => `/api/decks/${deckId}/subscribe`,
+		method: postData,
+		defaultErrorMessage: 'Failed to add deck',
+	}),
+
+	unsubscribe: endpoint<void, SubscribeResult>({
+		url: ({ deckId }) => `/api/decks/${deckId}/subscribe`,
+		method: deleteData,
+		defaultErrorMessage: 'Failed to remove deck',
 	}),
 
 	getById: endpoint<void, DeckDTO>({

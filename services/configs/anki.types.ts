@@ -20,6 +20,11 @@ interface DeckDTO {
 	createdAt: string
 	updatedAt: string
 	cardCount?: number
+	// Present on GET /decks/:id (single deck), used for the read-only view of
+	// another user's public deck.
+	ownerName?: string | null
+	isOwner?: boolean
+	isSubscribed?: boolean
 }
 
 interface CardDTO {
@@ -39,6 +44,45 @@ interface DeckCardEntry {
 	createdAt: string
 	tags: string[]
 	addedAt: string
+}
+
+// ── Discovery / subscriptions ────────────────────────────────────────────────
+
+type ExploreSort = 'new' | 'popular' | 'name'
+
+// Enriched deck row from /decks/explore and /decks/saved.
+interface ExploreDeckDTO {
+	id: string
+	name: string
+	description: string | null
+	ownerId: string | null
+	ownerName: string | null
+	ownerAvatar: string | null
+	visibility: Visibility
+	cardCount: number
+	subscriberCount: number
+	createdAt: string | null
+	isSubscribed: boolean
+	isOwner: boolean
+}
+
+// Paginated search result. NOTE: unlike other endpoints (raw DTO/array), the
+// explore endpoint intentionally returns this wrapper so pagination has a total.
+interface ExploreResult {
+	items: ExploreDeckDTO[]
+	total: number
+	page: number
+	pageSize: number
+	sort: ExploreSort
+}
+
+interface SavedDeckDTO extends ExploreDeckDTO {
+	subscribedAt: string | null
+}
+
+interface SubscribeResult {
+	deckId: string
+	subscribed: boolean
 }
 
 // Returned when editing the deck-scoped tags of a link.
@@ -161,4 +205,9 @@ export type {
 	RemoveCardFromDeckResult,
 	DeleteCardResult,
 	ResetReviewResult,
+	ExploreSort,
+	ExploreDeckDTO,
+	ExploreResult,
+	SavedDeckDTO,
+	SubscribeResult,
 }
