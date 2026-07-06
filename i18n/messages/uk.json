@@ -112,7 +112,9 @@
 			"by": "від {name}",
 			"readonlyHint": "Ви переглядаєте публічну колоду від {name}.",
 			"subscribe": "Додати до себе",
-			"unsubscribe": "Прибрати з моїх колод"
+			"unsubscribe": "Прибрати з моїх колод",
+			"noSearchResultsTitle": "Нічого не знайдено",
+			"noSearchResultsDescription": "Спробуйте інший запит."
 		},
 		"card": {
 			"add": "Додати картку",
@@ -191,7 +193,9 @@
 			"link": "Слова таблицею",
 			"empty": "Тут поки немає слів",
 			"prev": "Назад",
-			"next": "Далі"
+			"next": "Далі",
+			"searchPlaceholder": "Пошук слів...",
+			"noSearchResults": "Немає слів за цим пошуком"
 		},
 		"nav": {
 			"brand": "MemWords",
