@@ -9,6 +9,7 @@ import type {
 	DeckDTO,
 	DeckCardEntry,
 	DeckCardLink,
+	DeckCardsResult,
 	CreateDeckBody,
 	UpdateDeckBody,
 	CreateCardBody,
@@ -79,10 +80,16 @@ const deckApiConfig = {
 	}),
 
 	// ── Cards inside a deck ────────────────────────────────────────────────────
-	listCards: endpoint<void, DeckCardEntry[]>({
+	listCards: endpoint<void, DeckCardsResult>({
 		url: ({ deckId }) => `/api/decks/${deckId}/cards`,
 		method: getData,
 		defaultErrorMessage: 'Failed to load cards',
+	}),
+
+	listCardTags: endpoint<void, string[]>({
+		url: ({ deckId }) => `/api/decks/${deckId}/cards/tags`,
+		method: getData,
+		defaultErrorMessage: 'Failed to load tags',
 	}),
 
 	createCard: endpoint<CreateCardBody, DeckCardEntry>({

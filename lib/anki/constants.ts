@@ -6,6 +6,9 @@ const STUDY_DAILY_LIMIT = 20
 // Rows per page in the words table.
 const WORDS_PAGE_SIZE = 10
 
+// Cards per page on the deck detail (card-list) view.
+const DECK_CARDS_PAGE_SIZE = 10
+
 // Deck cards per page on the Explore page (server-side pagination).
 const EXPLORE_PAGE_SIZE = 12
 
@@ -36,6 +39,7 @@ const RATING_OPTIONS: RatingOption[] = [
 export {
 	STUDY_DAILY_LIMIT,
 	WORDS_PAGE_SIZE,
+	DECK_CARDS_PAGE_SIZE,
 	EXPLORE_PAGE_SIZE,
 	EXPLORE_SORTS,
 	EXPLORE_SEARCH_DEBOUNCE_MS,

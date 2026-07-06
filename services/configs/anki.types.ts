@@ -46,6 +46,16 @@ interface DeckCardEntry {
 	addedAt: string
 }
 
+type CardSort = 'new' | 'old'
+
+// Paginated result for GET /decks/:deckId/cards (search + pagination).
+interface DeckCardsResult {
+	items: DeckCardEntry[]
+	total: number
+	page: number
+	pageSize: number
+}
+
 // ── Discovery / subscriptions ────────────────────────────────────────────────
 
 type ExploreSort = 'new' | 'popular' | 'name'
@@ -190,6 +200,8 @@ export type {
 	DeckDTO,
 	CardDTO,
 	DeckCardEntry,
+	CardSort,
+	DeckCardsResult,
 	DeckCardLink,
 	ReviewDTO,
 	StudyCard,
