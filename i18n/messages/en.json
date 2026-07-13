@@ -112,7 +112,9 @@
 			"by": "by {name}",
 			"readonlyHint": "You're viewing a public deck by {name}.",
 			"subscribe": "Add to my decks",
-			"unsubscribe": "Remove from my decks"
+			"unsubscribe": "Remove from my decks",
+			"noSearchResultsTitle": "No matching cards",
+			"noSearchResultsDescription": "Try a different search."
 		},
 		"card": {
 			"add": "Add card",
@@ -191,7 +193,9 @@
 			"link": "Words table",
 			"empty": "No words yet",
 			"prev": "Prev",
-			"next": "Next"
+			"next": "Next",
+			"searchPlaceholder": "Search words...",
+			"noSearchResults": "No words match your search"
 		},
 		"nav": {
 			"brand": "MemWords",

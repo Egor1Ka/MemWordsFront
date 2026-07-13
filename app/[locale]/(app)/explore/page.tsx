@@ -36,24 +36,11 @@ import {
 	EXPLORE_SEARCH_DEBOUNCE_MS,
 } from '@/lib/anki/constants'
 import { useApiErrorToast } from '@/lib/anki/use-api-error'
+import { useDebouncedSearchInput } from '@/hooks/use-debounced-search-input'
+import { buildPageList } from '@/lib/anki/build-page-list'
 
 const normalizeSort = (raw: string | null): ExploreSort =>
 	EXPLORE_SORTS.includes(raw as ExploreSort) ? (raw as ExploreSort) : 'new'
-
-// Compact page list with ellipsis: 1 … current-1 current current+1 … total
-const buildPageList = (current: number, total: number): Array<number | 'gap'> => {
-	const wanted = [1, total, current - 1, current, current + 1]
-	const inRange = (page: number) => page >= 1 && page <= total
-	const unique = Array.from(new Set(wanted.filter(inRange))).sort(
-		(a, b) => a - b,
-	)
-	const withGaps = (page: number, index: number): Array<number | 'gap'> => {
-		const previous = unique[index - 1]
-		const hasGap = index > 0 && page - previous > 1
-		return hasGap ? ['gap', page] : [page]
-	}
-	return unique.flatMap(withGaps)
-}
 
 // Curried, pure updaters so the optimistic toggle has no inline closures.
 const toItemWithSubscription =
@@ -89,7 +76,6 @@ export default function ExplorePage() {
 	const sort = normalizeSort(searchParams.get('sort'))
 	const page = Math.max(1, Number(searchParams.get('page')) || 1)
 
-	const [searchInput, setSearchInput] = useState(q)
 	const [result, setResult] = useState<ExploreResult | null>(null)
 	const [loading, setLoading] = useState(true)
 
@@ -107,13 +93,11 @@ export default function ExplorePage() {
 		[router, pathname, searchParams],
 	)
 
-	// Debounce the search box into the URL (resetting to page 1).
-	useEffect(() => {
-		const handle = setTimeout(() => {
-			if (searchInput !== q) pushParams({ q: searchInput, page: 1 })
-		}, EXPLORE_SEARCH_DEBOUNCE_MS)
-		return () => clearTimeout(handle)
-	}, [searchInput, q, pushParams])
+	const [searchInput, setSearchInput] = useDebouncedSearchInput(
+		q,
+		EXPLORE_SEARCH_DEBOUNCE_MS,
+		useCallback((next: string) => pushParams({ q: next, page: 1 }), [pushParams]),
+	)
 
 	useEffect(() => {
 		const load = async () => {

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import {
 	ArrowDownWideNarrow,
@@ -12,9 +12,11 @@ import {
 	ChevronLeft,
 	ChevronRight,
 	Inbox,
+	Search,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
 	Table,
@@ -37,9 +39,11 @@ import {
 	EmptyTitle,
 } from '@/components/ui/empty'
 import { RevealText } from '@/components/anki/reveal-text'
+import { useDebouncedSearchInput } from '@/hooks/use-debounced-search-input'
+import { buildPageList } from '@/lib/anki/build-page-list'
 import { deckApi } from '@/services'
 import type { DeckCardEntry, DeckDTO } from '@/services'
-import { WORDS_PAGE_SIZE } from '@/lib/anki/constants'
+import { EXPLORE_SEARCH_DEBOUNCE_MS, WORDS_PAGE_SIZE } from '@/lib/anki/constants'
 import { useApiErrorToast } from '@/lib/anki/use-api-error'
 
 type SortOrder = 'new' | 'old'
@@ -47,29 +51,6 @@ type SortOrder = 'new' | 'old'
 // Per-deck localStorage key remembering whether the word/translation columns are
 // swapped (so each deck keeps its own orientation across visits).
 const SWAP_STORAGE_PREFIX = 'memwords:words-swap:'
-
-const addedAtMs = (entry: DeckCardEntry): number =>
-	new Date(entry.addedAt).getTime()
-
-const newestFirst = (a: DeckCardEntry, b: DeckCardEntry): number =>
-	addedAtMs(b) - addedAtMs(a)
-
-const oldestFirst = (a: DeckCardEntry, b: DeckCardEntry): number =>
-	addedAtMs(a) - addedAtMs(b)
-
-// Compact page list with ellipsis: 1 … current-1 current current+1 … total
-const buildPageList = (current: number, total: number): Array<number | 'gap'> => {
-	const wanted = [1, total, current - 1, current, current + 1]
-	const inRange = (page: number) => page >= 1 && page <= total
-	const unique = Array.from(new Set(wanted.filter(inRange))).sort(
-		(a, b) => a - b,
-	)
-	return unique.flatMap((page, index) => {
-		const previous = unique[index - 1]
-		const hasGap = index > 0 && page - previous > 1
-		return hasGap ? ['gap' as const, page] : [page]
-	})
-}
 
 export default function WordsTablePage() {
 	const { deckId } = useParams<{ deckId: string }>()
@@ -81,11 +62,13 @@ export default function WordsTablePage() {
 
 	const [deck, setDeck] = useState<DeckDTO | null>(null)
 	const [entries, setEntries] = useState<DeckCardEntry[]>([])
+	const [total, setTotal] = useState(0)
 	const [loading, setLoading] = useState(true)
 	const [swapped, setSwapped] = useState(false)
 
+	const q = searchParams.get('q') ?? ''
 	const sort: SortOrder = searchParams.get('sort') === 'old' ? 'old' : 'new'
-	const requestedPage = Math.max(1, Number(searchParams.get('page')) || 1)
+	const page = Math.max(1, Number(searchParams.get('page')) || 1)
 	const swapStorageKey = `${SWAP_STORAGE_PREFIX}${deckId}`
 
 	// Read the saved orientation after mount (localStorage is client-only).
@@ -105,46 +88,55 @@ export default function WordsTablePage() {
 		swapped ? entry.front : entry.back
 
 	useEffect(() => {
-		const load = async () => {
-			try {
-				const [deckResult, cards] = await Promise.all([
-					deckApi
-						.getById({ pathParams: { deckId }, silent: true })
-						.catch(() => null),
-					deckApi.listCards({ pathParams: { deckId }, silent: true }),
-				])
-				setDeck(deckResult)
-				setEntries(cards)
-			} catch (error) {
-				notifyApiError(error)
-			} finally {
-				setLoading(false)
-			}
+		const loadDeck = async () => {
+			const result = await deckApi
+				.getById({ pathParams: { deckId }, silent: true })
+				.catch(() => null)
+			setDeck(result)
 		}
-		load()
-	}, [deckId, notifyApiError])
+		loadDeck()
+	}, [deckId])
 
-	const ordered = useMemo(() => {
-		const compare = sort === 'new' ? newestFirst : oldestFirst
-		return [...entries].sort(compare)
-	}, [entries, sort])
+	const refreshEntries = useCallback(async () => {
+		try {
+			const result = await deckApi.listCards({
+				pathParams: { deckId },
+				queryParams: { q: q || undefined, sort, page, pageSize: WORDS_PAGE_SIZE },
+				silent: true,
+			})
+			setEntries(result.items)
+			setTotal(result.total)
+		} catch (error) {
+			notifyApiError(error)
+		} finally {
+			setLoading(false)
+		}
+	}, [deckId, q, sort, page, notifyApiError])
 
-	const total = ordered.length
+	useEffect(() => {
+		refreshEntries()
+	}, [refreshEntries])
+
 	const totalPages = Math.max(1, Math.ceil(total / WORDS_PAGE_SIZE))
-	const page = Math.min(requestedPage, totalPages)
-	const pageItems = ordered.slice(
-		(page - 1) * WORDS_PAGE_SIZE,
-		page * WORDS_PAGE_SIZE,
-	)
 
 	const pushParams = useCallback(
-		(next: { page?: number; sort?: SortOrder }) => {
+		(next: { q?: string; page?: number; sort?: SortOrder }) => {
 			const params = new URLSearchParams(searchParams.toString())
+			if (next.q !== undefined) {
+				if (next.q) params.set('q', next.q)
+				else params.delete('q')
+			}
 			if (next.sort) params.set('sort', next.sort)
 			if (next.page) params.set('page', String(next.page))
 			router.replace(`${pathname}?${params.toString()}`, { scroll: false })
 		},
 		[router, pathname, searchParams],
+	)
+
+	const [searchInput, setSearchInput] = useDebouncedSearchInput(
+		q,
+		EXPLORE_SEARCH_DEBOUNCE_MS,
+		useCallback((next: string) => pushParams({ q: next, page: 1 }), [pushParams]),
 	)
 
 	const goToPage = (target: number) => pushParams({ page: target })
@@ -234,6 +226,17 @@ export default function WordsTablePage() {
 				</div>
 			</div>
 
+			<div className="relative min-w-0">
+				<Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+				<Input
+					value={searchInput}
+					onChange={(event) => setSearchInput(event.target.value)}
+					placeholder={t('words.searchPlaceholder')}
+					className="pl-9"
+					aria-label={t('words.searchPlaceholder')}
+				/>
+			</div>
+
 			{loading ? (
 				<div className="space-y-2">
 					<Skeleton className="h-10 rounded-lg" />
@@ -246,7 +249,7 @@ export default function WordsTablePage() {
 						<EmptyMedia variant="icon">
 							<Inbox />
 						</EmptyMedia>
-						<EmptyTitle>{t('words.empty')}</EmptyTitle>
+						<EmptyTitle>{q ? t('words.noSearchResults') : t('words.empty')}</EmptyTitle>
 					</EmptyHeader>
 				</Empty>
 			) : (
@@ -267,7 +270,7 @@ export default function WordsTablePage() {
 									</TableHead>
 								</TableRow>
 							</TableHeader>
-							<TableBody>{pageItems.map(renderRow)}</TableBody>
+							<TableBody>{entries.map(renderRow)}</TableBody>
 						</Table>
 					</div>
 
